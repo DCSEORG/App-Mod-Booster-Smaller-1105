@@ -8,13 +8,8 @@ Include:
 - App Service (with managed identity)
 - Azure SQL Database (with Entra ID authentication)
 - User-Assigned Managed Identity
-- Azure OpenAI (optional - deploy-with-chat.sh)
-- Cognitive Search / AI Search (optional - deploy-with-chat.sh)
 - Connection arrows showing:
   * App Service → SQL Database (via managed identity)
-  * App Service → Azure OpenAI (via managed identity)
-  * App Service → Cognitive Search (via managed identity)
   * User → App Service (HTTPS)
-  * User → Chat UI (HTTPS)
 
 Keep diagram simple and clear for understanding the architecture at a glance.

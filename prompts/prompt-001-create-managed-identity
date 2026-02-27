@@ -11,5 +11,3 @@ Output the following from the managed identity module:
 
 This managed identity will be used by:
 1. App Service to connect to Azure SQL
-2. App Service to connect to Azure OpenAI and Cognitive Search
-3. GenAI resources for cross-service authentication
