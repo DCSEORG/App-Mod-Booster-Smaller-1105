@@ -1,0 +1,60 @@
+@page
+@model ExpenseApp.Pages.Users.CreateModel
+@{
+    ViewData["Title"] = "New User";
+}
+
+<div class="container mt-4" style="max-width:560px">
+    <a href="/Users" class="text-decoration-none text-muted small">← Back to Users</a>
+    <h4 class="fw-semibold mt-2 mb-4">New User</h4>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+                    <input type="text" name="UserName" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="Email" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
+                    <select name="RoleId" class="form-select" required>
+                        <option value="">— Select role —</option>
+                        @foreach (var r in Model.Roles)
+                        {
+                            <option value="@r.RoleId">@r.RoleName</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Manager</label>
+                    <select name="ManagerId" class="form-select">
+                        <option value="">— None —</option>
+                        @foreach (var u in Model.Managers)
+                        {
+                            <option value="@u.UserId">@u.UserName</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                    <a href="/Users" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

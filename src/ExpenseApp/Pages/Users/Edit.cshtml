@@ -1,0 +1,74 @@
+@page
+@model ExpenseApp.Pages.Users.EditModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container mt-4" style="max-width:560px">
+    <a href="/Users" class="text-decoration-none text-muted small">← Back to Users</a>
+    <h4 class="fw-semibold mt-2 mb-4">Edit User</h4>
+
+    @if (Model.User is null)
+    {
+        <div class="alert alert-danger">User not found.</div>
+        return;
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.User.UserId" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+                    <input type="text" name="UserName" class="form-control" value="@Model.User.UserName" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="Email" class="form-control" value="@Model.User.Email" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
+                    <select name="RoleId" class="form-select" required>
+                        @foreach (var r in Model.Roles)
+                        {
+                            <option value="@r.RoleId" selected="@(r.RoleId == Model.User.RoleId)">@r.RoleName</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Manager</label>
+                    <select name="ManagerId" class="form-select">
+                        <option value="">— None —</option>
+                        @foreach (var u in Model.Managers)
+                        {
+                            <option value="@u.UserId" selected="@(u.UserId == Model.User.ManagerId)">@u.UserName</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="IsActive" value="true"
+                               id="isActiveCheck" @(Model.User.IsActive ? "checked" : "") />
+                        <label class="form-check-label" for="isActiveCheck">Active</label>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="/Users" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

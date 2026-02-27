@@ -1,0 +1,113 @@
+@page
+@model ExpenseApp.Pages.Expenses.IndexModel
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<div class="container mt-4">
+
+    @if (!string.IsNullOrEmpty(Model.DbError))
+    {
+        <div class="alert alert-warning alert-dismissible d-flex align-items-start gap-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 text-warning mt-1"></i>
+            <div>
+                <strong>Database connection issue – showing sample data</strong><br />
+                <span class="text-muted small">@Model.DbError</span>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="fw-semibold mb-0">Expenses</h4>
+        <a href="/Expenses/Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> New Expense
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-auto">
+            <select name="statusId" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                @foreach (var s in Model.Statuses)
+                {
+                    <option value="@s.StatusId" selected="@(Model.FilterStatusId == s.StatusId)">@s.StatusName</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <select name="userId" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">All Users</option>
+                @foreach (var u in Model.Users)
+                {
+                    <option value="@u.UserId" selected="@(Model.FilterUserId == u.UserId)">@u.UserName</option>
+                }
+            </select>
+        </div>
+        @if (Model.FilterStatusId.HasValue || Model.FilterUserId.HasValue)
+        {
+            <div class="col-auto">
+                <a href="/Expenses" class="btn btn-sm btn-outline-secondary">Clear</a>
+            </div>
+        }
+    </form>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Expenses.Any())
+                    {
+                        <tr><td colspan="8" class="text-center text-muted py-4">No expenses found.</td></tr>
+                    }
+                    @foreach (var e in Model.Expenses)
+                    {
+                        <tr>
+                            <td class="text-muted small">#@e.ExpenseId</td>
+                            <td>@e.UserName</td>
+                            <td>@e.CategoryName</td>
+                            <td>@e.ExpenseDate.ToString("dd MMM yyyy")</td>
+                            <td class="fw-semibold">@e.AmountFormatted</td>
+                            <td><span class="badge @StatusBadge(e.StatusName)">@e.StatusName</span></td>
+                            <td class="text-muted small">@(e.SubmittedAt?.ToString("dd MMM") ?? "—")</td>
+                            <td>
+                                <a href="/Expenses/Detail?id=@e.ExpenseId" class="btn btn-sm btn-outline-secondary me-1">View</a>
+                                @if (e.StatusName == "Draft")
+                                {
+                                    <a href="/Expenses/Edit?id=@e.ExpenseId" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                                }
+                                @if (e.StatusName == "Submitted")
+                                {
+                                    <a href="/Expenses/Detail?id=@e.ExpenseId" class="btn btn-sm btn-outline-success me-1">Review</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@functions {
+    static string StatusBadge(string status) => status switch
+    {
+        "Approved"  => "bg-success",
+        "Rejected"  => "bg-danger",
+        "Submitted" => "bg-warning text-dark",
+        _           => "bg-secondary",
+    };
+}

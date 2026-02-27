@@ -1,0 +1,59 @@
+@page
+@model ExpenseApp.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="container mt-4">
+
+    @if (!string.IsNullOrEmpty(Model.DbError))
+    {
+        <div class="alert alert-warning alert-dismissible d-flex align-items-start gap-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 text-warning mt-1"></i>
+            <div>
+                <strong>Database connection issue – showing sample data</strong><br />
+                <span class="text-muted small">@Model.DbError</span>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="fw-semibold mb-0">Expense Categories</h4>
+        <a href="/Categories/Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> New Category
+        </a>
+    </div>
+
+    <div class="card shadow-sm" style="max-width:600px">
+        <div class="list-group list-group-flush">
+            @if (!Model.Categories.Any())
+            {
+                <div class="list-group-item text-center text-muted py-4">No categories found.</div>
+            }
+            @foreach (var c in Model.Categories)
+            {
+                <div class="list-group-item d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="fw-semibold">@c.CategoryName</span>
+                        @if (!c.IsActive)
+                        {
+                            <span class="badge bg-light text-dark ms-2">Inactive</span>
+                        }
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="/Categories/Edit?id=@c.CategoryId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        @if (c.IsActive)
+                        {
+                            <form method="post" asp-page-handler="Deactivate" asp-route-id="@c.CategoryId" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Deactivate @c.CategoryName?')">Deactivate</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

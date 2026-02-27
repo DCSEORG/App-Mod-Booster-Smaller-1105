@@ -1,0 +1,104 @@
+@page
+@model ExpenseApp.Pages.Expenses.DetailModel
+@{
+    ViewData["Title"] = $"Expense #{Model.Expense?.ExpenseId}";
+}
+
+<div class="container mt-4" style="max-width:720px">
+    <a href="/Expenses" class="text-decoration-none text-muted small">← Back to Expenses</a>
+
+    @if (Model.Expense is null)
+    {
+        <div class="alert alert-danger mt-3">Expense not found.</div>
+        return;
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-@(Model.MessageClass) mt-3 alert-dismissible">
+            @Model.Message
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">Expense #@Model.Expense.ExpenseId</h5>
+            <span class="badge @StatusBadge(Model.Expense.StatusName) fs-6">@Model.Expense.StatusName</span>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Submitted by</dt>
+                <dd class="col-sm-8">@Model.Expense.UserName</dd>
+
+                <dt class="col-sm-4">Category</dt>
+                <dd class="col-sm-8">@Model.Expense.CategoryName</dd>
+
+                <dt class="col-sm-4">Date</dt>
+                <dd class="col-sm-8">@Model.Expense.ExpenseDate.ToString("dd MMMM yyyy")</dd>
+
+                <dt class="col-sm-4">Amount</dt>
+                <dd class="col-sm-8 fw-semibold fs-5">@Model.Expense.AmountFormatted</dd>
+
+                <dt class="col-sm-4">Description</dt>
+                <dd class="col-sm-8">@(Model.Expense.Description ?? "—")</dd>
+
+                <dt class="col-sm-4">Receipt</dt>
+                <dd class="col-sm-8">@(Model.Expense.ReceiptFile ?? "—")</dd>
+
+                @if (Model.Expense.SubmittedAt.HasValue)
+                {
+                    <dt class="col-sm-4">Submitted at</dt>
+                    <dd class="col-sm-8">@Model.Expense.SubmittedAt.Value.ToString("dd MMM yyyy HH:mm") UTC</dd>
+                }
+
+                @if (Model.Expense.ReviewerName is not null)
+                {
+                    <dt class="col-sm-4">Reviewed by</dt>
+                    <dd class="col-sm-8">@Model.Expense.ReviewerName (@Model.Expense.ReviewedAt?.ToString("dd MMM yyyy HH:mm") UTC)</dd>
+                }
+            </dl>
+        </div>
+        <div class="card-footer d-flex gap-2 flex-wrap">
+            @if (Model.Expense.StatusName == "Draft")
+            {
+                <a href="/Expenses/Edit?id=@Model.Expense.ExpenseId" class="btn btn-primary">Edit</a>
+                <form method="post" asp-page-handler="Submit" asp-route-id="@Model.Expense.ExpenseId">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-success" onclick="return confirm('Submit this expense for review?')">Submit for Review</button>
+                </form>
+                <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Expense.ExpenseId">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-outline-danger" onclick="return confirm('Delete this expense?')">Delete</button>
+                </form>
+            }
+            @if (Model.Expense.StatusName == "Submitted")
+            {
+                @* NOTE: In production, replace the hard-coded ReviewedBy value (2) with the
+                   current authenticated user's ID from User.FindFirstValue(ClaimTypes.NameIdentifier).
+                   This demo uses a fixed value since authentication is not configured. *@
+                <form method="post" asp-page-handler="Approve" asp-route-id="@Model.Expense.ExpenseId">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="reviewedBy" value="2" />
+                    <button class="btn btn-success" onclick="return confirm('Approve this expense?')">Approve</button>
+                </form>
+                <form method="post" asp-page-handler="Reject" asp-route-id="@Model.Expense.ExpenseId">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="reviewedBy" value="2" />
+                    <button class="btn btn-danger" onclick="return confirm('Reject this expense?')">Reject</button>
+                </form>
+            }
+            <a href="/Expenses" class="btn btn-outline-secondary ms-auto">Back</a>
+        </div>
+    </div>
+</div>
+
+@functions {
+    static string StatusBadge(string status) => status switch
+    {
+        "Approved"  => "bg-success",
+        "Rejected"  => "bg-danger",
+        "Submitted" => "bg-warning text-dark",
+        _           => "bg-secondary",
+    };
+}
