@@ -1,7 +1,7 @@
 # Prompt Reorganization Summary
 
 ## Overview
-Reorganized 25+ prompts into 13 focused, actionable prompts to optimize the app-mod-booster agent's performance.
+Reorganized 25+ prompts into 10 focused, actionable prompts to optimize agent performance, and introduced a three-agent workflow for parallel infrastructure and application deployment.
 
 ## Key Changes
 
@@ -11,13 +11,14 @@ Reorganized 25+ prompts into 13 focused, actionable prompts to optimize the app-
 - Required significant planning from the agent
 - Mixed multiple functionalities in single prompts
 - Verbose explanations requiring interpretation
+- Single monolithic agent
 
 ### After
-- 13 streamlined prompts, one per discrete functionality
+- 10 streamlined prompts, one per discrete functionality
 - All considerations retained and consolidated
 - Minimal planning required - each prompt is immediately actionable
-- Clear separation of concerns
-- Concise, directive instructions
+- Clear separation of concerns between infra and app prompts
+- Three specialized agents enabling parallel deployments
 
 ## New Prompt Structure
 
@@ -29,11 +30,21 @@ Reorganized 25+ prompts into 13 focused, actionable prompts to optimize the app-
 6. **prompt-006-create-stored-procedures** - Creates stored procs for data access
 7. **prompt-007-create-application-code** - Creates ASP.NET Razor Pages app
 8. **prompt-008-create-api-endpoints** - Creates REST APIs with Swagger
-9. **prompt-009-create-deployment-scripts** - Creates deploy.sh and deploy-with-chat.sh
-10. **prompt-010-create-genai-resources** - Creates Azure OpenAI and Cognitive Search
-11. **prompt-011-create-chat-ui** - Creates chat UI with RAG pattern
-12. **prompt-012-implement-function-calling** - Implements Azure OpenAI function calling
-13. **prompt-013-create-architecture-diagram** - Creates architecture diagram
+9. **prompt-009-create-deployment-scripts** - Creates deploy-infra.sh and deploy-app.sh
+10. **prompt-013-create-architecture-diagram** - Creates architecture diagram
+
+## Three-Agent Workflow
+
+### Booster-Spec-Agent
+Reads all prompts and produces `AgentVariables.sh` containing every shared variable needed by both infra and app agents. Run this first so the other two agents can operate in parallel.
+
+### Booster-Infra-Agent
+Uses infra prompts (001-003) to build all Azure Bicep templates and creates `deploy-infra.sh`. Sources `AgentVariables.sh` for all shared variable values.
+
+### Booster-App-Agent
+Uses app prompts (004-008) to build all application code and database scripts and creates `deploy-app.sh`. Sources `AgentVariables.sh` for all shared variable values.
+
+Booster-Infra-Agent and Booster-App-Agent can run **in parallel** after Booster-Spec-Agent completes because they share no outputs with each other - both draw their variables from `AgentVariables.sh`.
 
 ## Consolidated Considerations
 
@@ -43,7 +54,6 @@ All critical considerations from original prompts are retained:
 - Entra ID (Azure AD) only authentication
 - Managed identity for all Azure service connections
 - No SQL authentication, no API keys
-- XSS prevention in chat UI
 - MCAPS governance policy compliance
 
 ### Technical Requirements
@@ -57,7 +67,7 @@ All critical considerations from original prompts are retained:
 - 30-second waits for resource readiness
 - Proper deployment order
 - SQL firewall configuration (current IP + Azure services)
-- Post-deployment configuration via scripts (breaks circular dependencies)
+- Shared AgentVariables.sh sourced by both deploy scripts
 - App.zip at root level (not nested)
 
 ### Database Access Patterns
@@ -71,13 +81,6 @@ All critical considerations from original prompts are retained:
 - Detailed error messages with actionable fixes
 - User-friendly error displays
 
-### GenAI Integration
-- GPT-4o in swedencentral (avoid quota issues)
-- Function calling for database operations
-- RAG pattern with contextual information
-- Formatted list display in chat bubbles
-- Optional deployment (deploy.sh vs deploy-with-chat.sh)
-
 ## Performance Improvements
 
 1. **Reduced context switching** - Agent processes one clear task at a time
@@ -85,24 +88,28 @@ All critical considerations from original prompts are retained:
 3. **Minimal planning** - Each prompt is self-contained and actionable
 4. **Clear dependencies** - Sequential order matches infrastructure dependencies
 5. **Focused scope** - Each prompt has single responsibility
+6. **Parallel deployment** - Infra and app agents can run simultaneously
 
 ## Execution Flow
 
-The agent follows prompt-order sequentially:
-1. Infrastructure (identity, app service, SQL)
-2. Database setup (schema, roles, stored procedures)
-3. Application code (app, APIs)
-4. Deployment automation (scripts)
-5. Optional GenAI features (Azure OpenAI, chat UI, function calling)
-6. Documentation (architecture diagram)
+```
+Booster-Spec-Agent  →  generates AgentVariables.sh
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+  Booster-Infra-Agent               Booster-App-Agent
+  (prompts 001-003)                 (prompts 004-008)
+  → Bicep files                     → App code
+  → deploy-infra.sh                 → deploy-app.sh
+```
+
+Both deploy scripts source `AgentVariables.sh` so resource names (e.g. resource group) are consistent across infra and app deployments.
 
 ## Result
 
-The reorganized prompts enable the app-mod-booster agent to:
-- Execute faster by reducing planning overhead
-- Avoid confusion from redundant instructions
-- Follow a clear, logical progression
-- Handle each discrete functionality independently
-- Scale better if additional features are needed
-
-All original functionality and considerations are preserved while significantly improving execution efficiency.
+The reorganized prompts and three-agent model enable:
+- Faster execution through parallelism
+- Clear separation of infrastructure and application concerns
+- Independent deployability of infra and app layers
+- Consistent shared variables across all deployment scripts
+- No GenAI dependencies in the core workflow

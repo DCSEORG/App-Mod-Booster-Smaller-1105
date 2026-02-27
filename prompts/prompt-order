@@ -9,9 +9,6 @@ prompt-006-create-stored-procedures,
 prompt-007-create-application-code,
 prompt-008-create-api-endpoints,
 prompt-009-create-deployment-scripts,
-prompt-010-create-genai-resources,
-prompt-011-create-chat-ui,
-prompt-012-implement-function-calling,
 prompt-013-create-architecture-diagram
 
 Each prompt is a complete, actionable task requiring minimal planning. All considerations from the original prompts have been consolidated and retained. If the agent cannot find a prompt file, skip to the next one.
