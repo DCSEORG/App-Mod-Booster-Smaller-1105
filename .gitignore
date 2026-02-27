@@ -1,0 +1,14 @@
+# .NET build outputs
+src/*/bin/
+src/*/obj/
+src/*/publish/
+src/*/app.zip
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db

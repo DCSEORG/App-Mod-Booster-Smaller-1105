@@ -1,0 +1,93 @@
+/* site.css – Expense Manager custom styles */
+
+/* ── Dashboard hero ──────────────────────────────────────────────────────── */
+.dashboard-hero {
+    background: linear-gradient(135deg, #1a1f36 0%, #2563eb 100%);
+    color: #fff;
+    padding: 2.5rem 0 2rem;
+}
+
+.hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.hero-subtitle {
+    opacity: 0.8;
+    margin-bottom: 0;
+}
+
+/* ── Summary cards ───────────────────────────────────────────────────────── */
+.summary-card {
+    border-left: 4px solid #2563eb;
+    border-radius: 8px;
+    transition: transform 0.15s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.summary-count {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1f36;
+}
+
+/* ── Quick link cards ────────────────────────────────────────────────────── */
+.quick-link-card {
+    border-radius: 10px;
+    color: inherit;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.quick-link-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-2px);
+}
+
+.quick-link-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+.table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.footer {
+    margin-top: auto;
+}
+
+/* ── Utility ─────────────────────────────────────────────────────────────── */
+body {
+    background-color: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}

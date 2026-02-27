@@ -1,0 +1,15 @@
+@page
+@model ExpenseApp.Pages.ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container mt-5" style="max-width:600px">
+    <div class="alert alert-danger">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>An error occurred</h4>
+        <p>Request ID: <code>@Model.RequestId</code></p>
+        <hr />
+        <p class="mb-0">Please try again. If the problem persists, check the application logs.</p>
+    </div>
+    <a href="/Index" class="btn btn-outline-secondary">← Back to Dashboard</a>
+</div>
